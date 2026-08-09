@@ -157,7 +157,7 @@ function mensajePersonalizado(motivo) {
 function registrarIncidente(motivo) {
   incidentes.push({ motivo: motivo, hora: new Date().toISOString() });
   reproducirAlerta();
-
+  const nombre = primerNombre();
   document.getElementById('overlayTitulo').textContent = 'Aviso de integridad académica para '+nombre;
   document.getElementById('overlayMensaje').textContent = mensajePersonalizado(motivo);
   document.getElementById('overlay').style.display = 'flex';
