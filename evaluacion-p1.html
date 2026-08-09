@@ -97,6 +97,21 @@ let incidentes = [];
 let blurTimeout = null;
 let yaEnviado = false;
 
+/* =========================================================
+   Autocompletar el nombre si Moodle lo pasó como parámetro
+   en la URL (ver instrucciones: recurso URL > Parámetros)
+   ========================================================= */
+(function autocompletarNombre() {
+  const params = new URLSearchParams(window.location.search);
+  const nombreURL = params.get('nombre');
+  if (nombreURL) {
+    const campoNombre = document.getElementById('nombre');
+    campoNombre.value = decodeURIComponent(nombreURL.replace(/\+/g, ' '));
+    campoNombre.readOnly = true; // evita que lo edite o ponga otro nombre
+    campoNombre.style.background = '#eef3fb';
+  }
+})();
+
 function reproducirAlerta() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
