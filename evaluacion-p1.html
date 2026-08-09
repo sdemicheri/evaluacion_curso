@@ -148,17 +148,17 @@ function mensajePersonalizado(motivo) {
     ? 'el pegado de contenido externo en su respuesta'
     : 'la salida de la pestaña de la evaluación';
 
-  return nombre + ', se registró ' + accion + '. ' +
+  return 'Se registró ' + accion + '. ' +
          'Esta institución promueve la honestidad académica como parte fundamental de la formación de sus estudiantes: ' +
          'la evaluación tiene como fin genuino comprobar su propio aprendizaje, y omitir ese proceso le resta valor a su propio desarrollo. ' +
-         'El incidente quedó registrado con su nombre, email y hora exacta, y será revisado por el/la docente.';
+         nombre + ', el incidente quedó registrado en tu historial académico de la materia con nombre, email y hora exacta, y será revisado por el/la docente, quienes procederán a tomar las acciones pertinentes.';
 }
 
 function registrarIncidente(motivo) {
   incidentes.push({ motivo: motivo, hora: new Date().toISOString() });
   reproducirAlerta();
 
-  document.getElementById('overlayTitulo').textContent = 'Aviso de integridad académica';
+  document.getElementById('overlayTitulo').textContent = 'Aviso de integridad académica para '+nombre;
   document.getElementById('overlayMensaje').textContent = mensajePersonalizado(motivo);
   document.getElementById('overlay').style.display = 'flex';
 
