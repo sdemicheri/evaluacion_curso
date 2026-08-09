@@ -98,15 +98,25 @@ let blurTimeout = null;
 let yaEnviado = false;
 
 /* =========================================================
-   Autocompletar el nombre si Moodle lo pasó como parámetro
-   en la URL (ver instrucciones: recurso URL > Parámetros)
+   Datos del usuario que Moodle pasa como parámetros en la URL
+   (ver instrucciones: recurso URL > Parámetros)
+   - "nombre"          -> email del usuario logueado
+   - "nombre_completo" -> nombre y apellido del usuario logueado
    ========================================================= */
-(function autocompletarNombre() {
+let emailUsuario = '';
+
+(function autocompletarDatosUsuario() {
   const params = new URLSearchParams(window.location.search);
-  const nombreURL = params.get('nombre');
-  if (nombreURL) {
+  const emailURL = params.get('nombre');            // en realidad es el email
+  const nombreCompletoURL = params.get('nombre_completo');
+
+  if (emailURL) {
+    emailUsuario = decodeURIComponent(emailURL.replace(/\+/g, ' '));
+  }
+
+  if (nombreCompletoURL) {
     const campoNombre = document.getElementById('nombre');
-    campoNombre.value = decodeURIComponent(nombreURL.replace(/\+/g, ' '));
+    campoNombre.value = decodeURIComponent(nombreCompletoURL.replace(/\+/g, ' '));
     campoNombre.readOnly = true; // evita que lo edite o ponga otro nombre
     campoNombre.style.background = '#eef3fb';
   }
@@ -158,6 +168,7 @@ function enviarRespuesta(estado) {
 
   const payload = {
     nombre: document.getElementById('nombre').value,
+    email: emailUsuario,
     respuesta: document.getElementById('respuesta').value,
     estado: estado,
     incidentes: incidentes.map(i => i.motivo + ' (' + i.hora + ')').join(' | '),
