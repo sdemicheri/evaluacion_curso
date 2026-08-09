@@ -59,8 +59,8 @@
     text-align: center;
     padding: 20px;
   }
-  #overlay h2 { font-size: 1.8rem; margin-bottom: 10px; }
-  #overlay p { font-size: 1.05rem; max-width: 500px; }
+  #overlay h2 { font-size: 1.6rem; margin-bottom: 14px; font-weight: 600; letter-spacing: 0.3px; }
+  #overlay p { font-size: 1.05rem; max-width: 540px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -81,8 +81,8 @@
 <div id="estadoEnvio"></div>
 
 <div id="overlay">
-  <h2>⚠ Actividad sospechosa detectada</h2>
-  <p>Se registró un intento de copiar contenido o de salir de esta ventana. Su respuesta fue enviada automáticamente con esta observación.</p>
+  <h2 id="overlayTitulo">⚠ Actividad sospechosa detectada</h2>
+  <p id="overlayMensaje">Se registró un intento de copiar contenido o de salir de esta ventana. Su respuesta fue enviada automáticamente con esta observación.</p>
 </div>
 
 <script>
@@ -90,7 +90,7 @@
    CONFIGURACIÓN — reemplazá esta URL por la de tu Apps Script
    (ver instrucciones para crearla)
    ========================================================= */
-const GAS_URL = 'cuando tenga el sheet, pongo aca la url';
+const GAS_URL = 'PEGAR_ACA_LA_URL_DE_TU_APPS_SCRIPT';
 const TOLERANCIA_MS = 2000;
 
 let incidentes = [];
@@ -137,10 +137,31 @@ function reproducirAlerta() {
   } catch (e) { /* si el navegador bloquea autoplay, seguimos sin sonido */ }
 }
 
+function primerNombre() {
+  const completo = document.getElementById('nombre').value.trim();
+  return completo ? completo.split(' ')[0] : 'Estudiante';
+}
+
+function mensajePersonalizado(motivo) {
+  const nombre = primerNombre();
+  var accion = (motivo.indexOf('pegado') !== -1)
+    ? 'el pegado de contenido externo en su respuesta'
+    : 'la salida de la pestaña de la evaluación';
+
+  return nombre + ', se registró ' + accion + '. ' +
+         'Esta institución promueve la honestidad académica como parte fundamental de la formación de sus estudiantes: ' +
+         'la evaluación tiene como fin genuino comprobar su propio aprendizaje, y omitir ese proceso le resta valor a su propio desarrollo. ' +
+         'El incidente quedó registrado con su nombre, email y hora exacta, y será revisado por el/la docente.';
+}
+
 function registrarIncidente(motivo) {
   incidentes.push({ motivo: motivo, hora: new Date().toISOString() });
   reproducirAlerta();
+
+  document.getElementById('overlayTitulo').textContent = 'Aviso de integridad académica';
+  document.getElementById('overlayMensaje').textContent = mensajePersonalizado(motivo);
   document.getElementById('overlay').style.display = 'flex';
+
   document.getElementById('respuesta').disabled = true;
   document.getElementById('nombre').disabled = true;
   document.getElementById('enviar').disabled = true;
