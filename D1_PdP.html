@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Actividad Continua Nro 1</title>
+<title>Actividad Nro 1</title>
 <style>
   body {
     font-family: system-ui, sans-serif;
@@ -106,8 +106,8 @@ let emailUsuario = '';
 
 (function autocompletarDatosUsuario() {
   const params = new URLSearchParams(window.location.search);
-  const emailURL = params.get('nombre');            // en realidad es el email
-  const nombreCompletoURL = params.get('nombre_completo');
+  const emailURL = localStorage.getItem('username') || params.get('nombre');            // en realidad es el email
+  const nombreCompletoURL = localStorage.getItem('username') || params.get('nombre_completo');
 
   if (emailURL) {
     emailUsuario = decodeURIComponent(emailURL.replace(/\+/g, ' '));
