@@ -65,7 +65,7 @@
 </head>
 <body>
 
-<h1>Actividad Continua Nro 1</h1>
+<h1>Actividad Nro 1</h1>
 <div class="info">
   <p>Durante la actividad <strong>no está permitido pegar texto o contenido copiado, ni abandonar la plataforma o cambiar de pestaña/ventana</strong>.</p>
   <p>Cualquier acción de esta índole será considerada un incumplimiento de las condiciones de evaluación de esta actividad y <strong>podrá ser tomada como fraude contra la integridad académica</strong>.</p>
@@ -106,8 +106,6 @@ let emailUsuario = '';
 
 (function autocompletarDatosUsuario() {
   const params = new URLSearchParams(window.location.search);
-  console.log("a ver");
-  console.log(sessionStorage);
   const emailURL = localStorage.getItem('username') || params.get('nombre');            // en realidad es el email
   const nombreCompletoURL = localStorage.getItem('username') || params.get('nombre_completo');
 
