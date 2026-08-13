@@ -106,7 +106,8 @@ let emailUsuario = '';
 
 (function autocompletarDatosUsuario() {
   const params = new URLSearchParams(window.location.search);
-  console.log(localStorage);
+  console.log("a ver");
+  console.log(sessionStorage);
   const emailURL = localStorage.getItem('username') || params.get('nombre');            // en realidad es el email
   const nombreCompletoURL = localStorage.getItem('username') || params.get('nombre_completo');
 
