@@ -1,1 +1,226 @@
-https://script.google.com/macros/s/AKfycbwV0r5fQqk_pTV4Fk0fWRDWmkvpPiTk1lnRm4c2YkWA1t3aNG6PVN8jmu-YoszEL5xUqg/exec
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Actividad Continua Nro 1</title>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 0 20px;
+    background: #f4f6f8;
+    color: #222;
+  }
+  h1 { font-size: 1.3rem; }
+  label { display:block; margin-top: 16px; font-weight: bold; }
+  input[type=text], textarea {
+    width: 100%;
+    font-size: 1rem;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    margin-top: 6px;
+  }
+  textarea { height: 160px; }
+  button#enviar {
+    margin-top: 20px;
+    padding: 12px 28px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #2b7de9;
+    color: #fff;
+    font-weight: bold;
+  }
+  button#enviar:disabled { background: #999; cursor: not-allowed; }
+  .info {
+    background: #fff;
+    border-left: 4px solid #2b7de9;
+    padding: 10px 14px;
+    margin: 16px 0;
+    font-size: 0.85rem;
+  }
+  #estadoEnvio { margin-top: 12px; font-size: 0.9rem; }
+
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(150, 0, 0, 0.94);
+    color: #fff;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  #overlay h2 { font-size: 1.6rem; margin-bottom: 14px; font-weight: 600; letter-spacing: 0.3px; }
+  #overlay p { font-size: 1.05rem; max-width: 540px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>Actividad Continua Nro 1</h1>
+<div class="info">
+  <p>Durante la actividad <strong>no está permitido pegar texto o contenido copiado, ni abandonar la plataforma o cambiar de pestaña/ventana</strong>.</p>
+  <p>Cualquier acción de esta índole será considerada un incumplimiento de las condiciones de evaluación de esta actividad y <strong>podrá ser tomada como fraude contra la integridad académica</strong>.</p>
+</div>
+
+<label for="nombre">Nombre y apellido</label>
+<input type="text" id="nombre" required placeholder="Escriba su nombre completo">
+
+<label for="respuesta">Si dividir un programa en funciones es suficiente para resolver un problema de manera organizada, legible y mantenible ...
+<p>¿Por qué existen otros paradigma?</p></label>
+<textarea id="respuesta" required placeholder="Escriba su respuesta acá..."></textarea>
+
+<button id="enviar">Enviar respuesta</button>
+<div id="estadoEnvio"></div>
+
+<div id="overlay">
+  <h2 id="overlayTitulo">⚠ Actividad sospechosa detectada</h2>
+  <p id="overlayMensaje">Se registró un intento de copiar contenido o de salir de esta ventana. Su respuesta fue enviada automáticamente con esta observación.</p>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN — sheet
+   ========================================================= */
+var GAS_URL ='https://script.google.com/macros/s/AKfycbwV0r5fQqk_pTV4Fk0fWRDWmkvpPiTk1lnRm4c2YkWA1t3aNG6PVN8jmu-YoszEL5xUqg/exec';
+const TOLERANCIA_MS = 2000;
+
+let incidentes = [];
+let blurTimeout = null;
+let yaEnviado = false;
+
+/* =========================================================
+   Datos del usuario que Moodle pasa como parámetros en la URL
+   - "nombre"          -> email del usuario logueado
+   - "nombre_completo" -> nombre y apellido del usuario logueado
+   ========================================================= */
+let emailUsuario = '';
+
+(function autocompletarDatosUsuario() {
+  const params = new URLSearchParams(window.location.search);
+  const emailURL = params.get('nombre');            // en realidad es el email
+  const nombreCompletoURL = params.get('nombre_completo');
+
+  if (emailURL) {
+    emailUsuario = decodeURIComponent(emailURL.replace(/\+/g, ' '));
+  }
+
+  if (nombreCompletoURL) {
+    const campoNombre = document.getElementById('nombre');
+    campoNombre.value = decodeURIComponent(nombreCompletoURL.replace(/\+/g, ' '));
+    campoNombre.readOnly = true; // evita que lo edite o ponga otro nombre
+    campoNombre.style.background = '#eef3fb';
+  }
+})();
+
+function reproducirAlerta() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 880;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.6);
+  } catch (e) { /* si el navegador bloquea autoplay, seguimos sin sonido */ }
+}
+
+function primerNombre() {
+  const completo = document.getElementById('nombre').value.trim();
+  return completo ? completo.split(' ')[0] : 'Estudiante';
+}
+
+function mensajePersonalizado(motivo) {
+  const nombre = primerNombre();
+  var accion = (motivo.indexOf('pegado') !== -1)
+    ? 'el pegado de contenido externo en su respuesta'
+    : 'la salida de la pestaña de la actividad';
+
+  return 'Se registró ' + accion + '. ' +
+         'Esta institución promueve la honestidad académica como parte fundamental de la formación de sus estudiantes: ' +
+         'la actividad tiene como fin genuino comprobar su propio aprendizaje, y omitir ese proceso le resta valor a su propio desarrollo. ' +
+         nombre + ', el incidente quedó registrado en tu historial académico de la materia con nombre, email y hora exacta, y será revisado por el/la docente, quienes procederán a tomar las acciones pertinentes.';
+}
+
+function registrarIncidente(motivo) {
+  incidentes.push({ motivo: motivo, hora: new Date().toISOString() });
+  reproducirAlerta();
+  const nombre = primerNombre();
+  document.getElementById('overlayTitulo').textContent = 'Aviso de integridad académica para '+nombre;
+  document.getElementById('overlayMensaje').textContent = mensajePersonalizado(motivo);
+  document.getElementById('overlay').style.display = 'flex';
+
+  document.getElementById('respuesta').disabled = true;
+  document.getElementById('nombre').disabled = true;
+  document.getElementById('enviar').disabled = true;
+  enviarRespuesta('sospechoso');
+}
+
+document.getElementById('respuesta').addEventListener('paste', function () {
+  registrarIncidente('pegado de texto (Ctrl+V)');
+});
+
+document.addEventListener('visibilitychange', function () {
+  if (document.hidden) {
+    blurTimeout = setTimeout(function () {
+      registrarIncidente('cambio de pestaña o minimizado');
+    }, TOLERANCIA_MS);
+  } else if (blurTimeout) {
+    clearTimeout(blurTimeout);
+    blurTimeout = null;
+  }
+});
+
+function enviarRespuesta(estado) {
+  if (yaEnviado) return;
+  yaEnviado = true;
+
+  const payload = {
+    nombre: document.getElementById('nombre').value,
+    email: emailUsuario,
+    respuesta: document.getElementById('respuesta').value,
+    estado: estado,
+    incidentes: incidentes.map(i => i.motivo + ' (' + i.hora + ')').join(' | '),
+    timestamp: new Date().toISOString()
+  };
+
+  const estadoDiv = document.getElementById('estadoEnvio');
+  estadoDiv.textContent = 'Enviando...';
+
+  fetch(GAS_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  })
+  .then(function () {
+    estadoDiv.textContent = '✔ Respuesta enviada correctamente.';
+  })
+  .catch(function () {
+    estadoDiv.textContent = '⚠ No se pudo enviar. Avise a su docente.';
+    yaEnviado = false; // permite reintentar si falló la red
+  });
+}
+
+document.getElementById('enviar').addEventListener('click', function () {
+  if (!document.getElementById('nombre').value.trim() ||
+      !document.getElementById('respuesta').value.trim()) {
+    alert('Complete su nombre y la respuesta antes de enviar.');
+    return;
+  }
+  document.getElementById('enviar').disabled = true;
+  enviarRespuesta('normal');
+});
+</script>
+
+</body>
+</html>
