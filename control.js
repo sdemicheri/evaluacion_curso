@@ -1,5 +1,3 @@
-<p>
-<script type="text/javascript">// <![CDATA[
 (function() {
       var bodyId = document.body ? document.body.id : '';
   var enIntento = /^page-mod-quiz-(attempt|summary|review)/.test(bodyId);
@@ -687,5 +685,3 @@
       });
       window.addEventListener('focus', cancelarIncidente);
     })();
-// ]]></script>
-</p>
